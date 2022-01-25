@@ -2,6 +2,7 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/02/ALU.hdl
+// The solution from this file is inspired by https://github.com/zachallaun/hs-nand2tetris/blob/master/02/ALU.hdl
 
 /**
  * The ALU (Arithmetic Logic Unit).
@@ -42,5 +43,27 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+
+    // Determine if inputs should be zeroed out
+    Mux16(a=x, b=false, sel=zx, out=xzero);
+    Mux16(a=y, b=false, sel=zy, out=yzero);
+
+    // Determine if the inputs should be negated
+    Not16(in=xzero, out=notx);
+    Mux16(a=xzero, b=notx, sel=nx, out=xnegate);
+    Not16(in=yzero, out=noty);
+    Mux16(a=yzero, b=noty, sel=ny, out=ynegate);
+
+    // Determine to Or or And the inputs
+    And16(a=xnegate, b=ynegate, out=xandy);
+    Add16(a=xnegate, b=ynegate, out=xplusy);
+    Mux16(a=xandy, b=xplusy, sel=f, out=xy);
+
+    // Negate the output
+    Not16(in=xy, out=notxy);
+    Mux16(a=xy, b=notxy, sel=no, out[15]=ng, out[0..14]=checkzero, out=out);
+
+    // Deal with the zr output
+    Or15Way(in=checkzero, out=nonzero);
+    Not(in=nonzero, out=zr);
 }
