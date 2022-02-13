@@ -14,5 +14,17 @@ CHIP Bit {
     OUT out;
 
     PARTS:
-    // Put your code here:
+
+    DFF(in=muxout, out=dffout, out=out);
+
+    // The dff takes in the output from the mux (muxout)
+    // The output is going to two directions
+    // One is going straight to the output of the chip
+    // Another is going to the input of the mux which is dffout
+
+    Mux(a=dffout, b=in, sel=load, out=muxout);
+
+    // If load=1, then mux would take in
+    // Muxout would then be in (which is basically t-1)
+    // The output of the dff is basically 1+1 then
 }

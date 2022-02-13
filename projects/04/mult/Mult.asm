@@ -10,3 +10,47 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+// Pseudo code
+// i = 0, n = R1, sum = R0
+// for i = 0 to i = n
+// sum = sum + R0
+// R2 = sum
+
+    @i
+    M=0
+    @R1
+    D=M
+    @n
+    M=D
+    @sum
+    M=0
+
+(LOOP)
+    @i
+    D=M
+    @n
+    D=D-M
+    @STOP
+    D;JEQ
+
+    @sum
+    D=M
+    @R0
+    D=D+M
+    @sum
+    M=D
+    @i
+    M=M+1
+    @LOOP
+    0;JMP
+
+(STOP)
+    @sum
+    D=M
+    @R2
+    M=D
+
+(END)
+    @END
+    0;JMP

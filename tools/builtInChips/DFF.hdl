@@ -9,7 +9,6 @@
  */
 
 CHIP DFF {
-
     IN  in;
     OUT out;
 
