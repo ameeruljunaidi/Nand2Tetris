@@ -8,6 +8,9 @@
  * out = not (a == b)
  */
 
+// Not the Or of A and B
+// 1 And, 2 Or, 2 Not
+
 CHIP Xor {
     IN a, b;
     OUT out;

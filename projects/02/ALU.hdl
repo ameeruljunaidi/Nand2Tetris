@@ -2,7 +2,6 @@
 // and the book "The Elements of Computing Systems"
 // by Nisan and Schocken, MIT Press.
 // File name: projects/02/ALU.hdl
-// The solution from this file is inspired by https://github.com/zachallaun/hs-nand2tetris/blob/master/02/ALU.hdl
 
 /**
  * The ALU (Arithmetic Logic Unit).
@@ -61,9 +60,11 @@ CHIP ALU {
 
     // Negate the output
     Not16(in=xy, out=notxy);
-    Mux16(a=xy, b=notxy, sel=no, out[15]=ng, out[0..14]=checkzero, out=out);
+    Mux16(a=xy, b=notxy, sel=no, out[15]=ng, out[0..7]=checkzero1, out[8..15]=checkzero2, out=out);
 
     // Deal with the zr output
-    Or15Way(in=checkzero, out=nonzero);
-    Not(in=nonzero, out=zr);
+    Or8Way(in=checkzero1, out=checkzero3);
+    Or8Way(in=checkzero2, out=checkzero4);
+    Or(a=checkzero3, b=checkzero4, out=checkzero5);
+    Not(in=checkzero5, out=zr);
 }
