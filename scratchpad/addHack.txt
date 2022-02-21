@@ -1,0 +1,13 @@
+a    b c      d   e
+0 00 0 000000 000 010
+1 11 0 110000 010 000
+0 00 0 000000 000 011
+1 11 0 000010 010 000
+0 00 0 000000 000 000
+1 11 0 001100 001 000
+
+a: if it is an A or C instruction (0 - A, 1 - C)
+b: direct register, or index into memory
+c: what computations to do, same as ALU
+d: where to store (A, M, or D)
+e: under what condition it should jump
