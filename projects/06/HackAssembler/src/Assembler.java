@@ -3,9 +3,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Assembler {
-    private Parser parser;
-    private SymbolTable symbolTable;
-    private List<String> translatedLines;
+    private final Parser parser;
+    private final SymbolTable symbolTable;
+    private final List<String> translatedLines;
 
     public Assembler(String filename) {
         this.parser = new Parser(filename);
@@ -63,11 +63,8 @@ public class Assembler {
      */
     private void secondPass() {
         while (parser.hasMoreCommands()) {
-            if (parser.commandType().equals("A_COMMAND")) {
-                processACommand();
-            } else if (parser.commandType().equals("C_COMMAND")) {
-                processCCommand();
-            }
+            if (parser.commandType().equals("A_COMMAND")) processACommand();
+            else if (parser.commandType().equals("C_COMMAND")) processCCommand();
             parser.advance();
         }
 
@@ -81,9 +78,7 @@ public class Assembler {
         StringBuilder sb = new StringBuilder();
         sb.append("0");
 
-        if (!symbolTable.contains(parser.getSymbol())) {
-            symbolTable.addEntry(parser.getSymbol());
-        }
+        if (!symbolTable.contains(parser.getSymbol())) symbolTable.addEntry(parser.getSymbol());
 
         sb.append(symbolTable.getAddress(parser.getSymbol()));
         translatedLines.add(sb.toString());

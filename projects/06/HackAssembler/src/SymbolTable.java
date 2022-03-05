@@ -67,7 +67,9 @@ public class SymbolTable {
 
     public void addEntry(String symbol) {
         if (isInt(symbol)) {
-            symbolTable.put(symbol, Integer.parseInt(symbol));
+            int address = Integer.parseInt(symbol);
+            symbolTable.put(symbol, address);
+            usedAddresses.add(address);
             return;
         }
 
