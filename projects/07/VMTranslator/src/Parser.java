@@ -80,24 +80,12 @@ public class Parser {
     public String commandType() {
         String firstChar = getCurrentCommand().split(" ")[0];
 
-        switch (firstChar) {
-            case "push":
-                return "C_PUSH";
-            case "pop":
-                return "C_POP";
-            case "add":
-            case "sub":
-            case "neg":
-            case "eq":
-            case "gt":
-            case "lt":
-            case "and":
-            case "or":
-            case "not":
-                return "C_ARITHMETIC";
-            default:
-                return "C_TYPE_ERROR";
-        }
+        return switch (firstChar) {
+            case "push" -> "C_PUSH";
+            case "pop" -> "C_POP";
+            case "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" -> "C_ARITHMETIC";
+            default -> "C_TYPE_ERROR";
+        };
     }
 
     /**

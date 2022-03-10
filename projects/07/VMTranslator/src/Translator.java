@@ -47,33 +47,15 @@ public class Translator {
     private void writeArithmetic(String command) {
         includeComment();
         switch (command) {
-            case "add":
-                writeAddSub("add");
-                break;
-            case "sub":
-                writeAddSub("sub");
-                break;
-            case "eq":
-                writeComparison("eq");
-                break;
-            case "lt":
-                writeComparison("lt");
-                break;
-            case "gt":
-                writeComparison("gt");
-                break;
-            case "not":
-                writeLogic("!");
-                break;
-            case "neg":
-                writeLogic("-");
-                break;
-            case "and":
-                writeLogic("&");
-                break;
-            case "or":
-                writeLogic("|");
-                break;
+            case "add" -> writeAddSub("add");
+            case "sub" -> writeAddSub("sub");
+            case "eq" -> writeComparison("eq");
+            case "lt" -> writeComparison("lt");
+            case "gt" -> writeComparison("gt");
+            case "not" -> writeLogic("!");
+            case "neg" -> writeLogic("-");
+            case "and" -> writeLogic("&");
+            case "or" -> writeLogic("|");
         }
         emptyLine();
     }
