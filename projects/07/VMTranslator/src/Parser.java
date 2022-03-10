@@ -4,7 +4,6 @@ import org.apache.commons.io.FilenameUtils;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Parser {
@@ -17,7 +16,7 @@ public class Parser {
     public Parser(String filename) {
         currentLineNumber = 0;
         parentDirectory = getParentDirectory();
-        selectedFile = new File(parentDirectory + "/" + filename);
+        selectedFile = new File(filename);
         fileExtension = getFileExtension();
 
         if (!selectedFile.exists() || !selectedFile.exists() || !fileExtension.equals("vm")) {

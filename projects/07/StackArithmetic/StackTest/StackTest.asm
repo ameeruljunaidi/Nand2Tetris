@@ -188,25 +188,35 @@ D=M
 M=M-1
 @SP
 A=M
-D=M-D
+D=D-M
 
 @LT3
 D;JLT
 
+@JEQ3
+D;JEQ
+
 @NLT3
-0;JLT
+0;JEQ
 
 (LT3)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE3
+0;JEQ
+
+(JEQ3)
+@SP
+A=M
+M=0
 @CONTINUE3
 0;JEQ
 
 (NLT3)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE3
 0;JEQ
 
@@ -242,25 +252,35 @@ D=M
 M=M-1
 @SP
 A=M
-D=M-D
+D=D-M
 
 @LT4
 D;JLT
 
+@JEQ4
+D;JEQ
+
 @NLT4
-0;JLT
+0;JEQ
 
 (LT4)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE4
+0;JEQ
+
+(JEQ4)
+@SP
+A=M
+M=0
 @CONTINUE4
 0;JEQ
 
 (NLT4)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE4
 0;JEQ
 
@@ -296,25 +316,35 @@ D=M
 M=M-1
 @SP
 A=M
-D=M-D
+D=D-M
 
 @LT5
 D;JLT
 
+@JEQ5
+D;JEQ
+
 @NLT5
-0;JLT
+0;JEQ
 
 (LT5)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE5
+0;JEQ
+
+(JEQ5)
+@SP
+A=M
+M=0
 @CONTINUE5
 0;JEQ
 
 (NLT5)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE5
 0;JEQ
 
@@ -355,20 +385,30 @@ D=D-M
 @GT6
 D;JGT
 
+@JEQ6
+D;JEQ
+
 @NGT6
-0;JGT
+0;JEQ
 
 (GT6)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE6
+0;JEQ
+
+(JEQ6)
+@SP
+A=M
+M=0
 @CONTINUE6
 0;JEQ
 
 (NGT6)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE6
 0;JEQ
 
@@ -409,20 +449,30 @@ D=D-M
 @GT7
 D;JGT
 
+@JEQ7
+D;JEQ
+
 @NGT7
-0;JGT
+0;JEQ
 
 (GT7)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE7
+0;JEQ
+
+(JEQ7)
+@SP
+A=M
+M=0
 @CONTINUE7
 0;JEQ
 
 (NGT7)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE7
 0;JEQ
 
@@ -463,20 +513,30 @@ D=D-M
 @GT8
 D;JGT
 
+@JEQ8
+D;JEQ
+
 @NGT8
-0;JGT
+0;JEQ
 
 (GT8)
 @SP
 A=M
-M=-1
+M=0
+@CONTINUE8
+0;JEQ
+
+(JEQ8)
+@SP
+A=M
+M=0
 @CONTINUE8
 0;JEQ
 
 (NGT8)
 @SP
 A=M
-M=0
+M=-1
 @CONTINUE8
 0;JEQ
 
@@ -544,41 +604,7 @@ D=M
 M=M-1
 @SP
 A=M
-M=D-M
-@SP
-M=M+1
-@SP
-M=M-1
-@SP
-A=M
-D=M
-@SP
-M=M-1
-@SP
-A=M
-D=D-M
-
-@EQ9
-D;JEQ
-
-@NEQ9
-0;JEQ
-
-(EQ9)
-@SP
-A=M
-M=-1
-@CONTINUE9
-0;JEQ
-
-(NEQ9)
-@SP
-A=M
-M=0
-@CONTINUE9
-0;JEQ
-
-(CONTINUE9)
+M=M-D
 @SP
 M=M+1
 
@@ -594,8 +620,6 @@ M=M+1
 // and
 @SP
 M=M-1
-@SP
-A=M
 @SP
 A=M
 D=M
@@ -619,8 +643,6 @@ M=M+1
 // or
 @SP
 M=M-1
-@SP
-A=M
 @SP
 A=M
 D=M

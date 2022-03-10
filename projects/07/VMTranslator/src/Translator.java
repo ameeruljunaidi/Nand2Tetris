@@ -2,13 +2,13 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Writer {
+public class Translator {
     private final Parser parser;
     private final List<String> translatedLines;
     private int currentLine;
     private int continueIndex;
 
-    public Writer(String filename) {
+    public Translator(String filename) {
         parser = new Parser(filename);
         translatedLines = new ArrayList<>();
         continueIndex = 0;
@@ -16,7 +16,7 @@ public class Writer {
         translate();
     }
 
-    public Writer() {
+    public Translator() {
         parser = new Parser();
         translatedLines = new ArrayList<>();
         currentLine = 0;
@@ -47,17 +47,33 @@ public class Writer {
     private void writeArithmetic(String command) {
         includeComment();
         switch (command) {
-            case "add" -> writeAddSub("add");
-            case "sub" -> writeAddSub("sub");
-            case "eq" -> writeComparison("eq");
-            case "lt" -> writeComparison("lt");
-            case "gt" -> writeComparison("gt");
-            case "not" -> writeLogic("!");
-            case "neg" -> writeLogic("-");
-            case "and" -> writeLogic("&");
-            case "or" -> writeLogic("|");
-            default -> {
-            }
+            case "add":
+                writeAddSub("add");
+                break;
+            case "sub":
+                writeAddSub("sub");
+                break;
+            case "eq":
+                writeComparison("eq");
+                break;
+            case "lt":
+                writeComparison("lt");
+                break;
+            case "gt":
+                writeComparison("gt");
+                break;
+            case "not":
+                writeLogic("!");
+                break;
+            case "neg":
+                writeLogic("-");
+                break;
+            case "and":
+                writeLogic("&");
+                break;
+            case "or":
+                writeLogic("|");
+                break;
         }
         emptyLine();
     }
@@ -385,7 +401,7 @@ public class Writer {
     }
 
     public static void testTranslator() {
-        Writer t = new Writer("MemoryAccess/PointerTest/PointerTest.vm");
+        Translator t = new Translator("MemoryAccess/PointerTest/PointerTest.vm");
         for (String line : t.translatedLines) System.out.println(line);
         System.out.println(t.currentLine);
         t.generateAssemblyCode();
