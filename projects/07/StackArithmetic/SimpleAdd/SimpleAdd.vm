@@ -7,3 +7,24 @@
 push constant 7
 push constant 8
 add
+
+// @7
+// D=A -> this takes the value of address seven and stores it in D register
+// @SP
+// A=M -> takes the address at the pointer and selects it
+// M=D -> the value at that address will then take the value of D
+// @SP
+// M=M+1 -> increment the stack pointer
+
+// @8
+// D=A
+// @SP
+// A=M
+// M=D
+// @SP
+// M=M+1
+
+
+
+
+
