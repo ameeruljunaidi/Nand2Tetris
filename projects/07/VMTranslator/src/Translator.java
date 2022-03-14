@@ -165,7 +165,7 @@ public class Translator {
             write("D=A+D");
         } else {
             write("@" + segment);
-            write("D=M+D");
+            write("D=D+M");
         }
         write("@" + at);
         write("M=D");
@@ -188,7 +188,7 @@ public class Translator {
 
     private void writeAddSub(String type) {
         getTopValueAndGoToNextTop();
-        if (type.equals("add")) write("M=M+D");
+        if (type.equals("add")) write("M=D+M");
         else if (type.equals("sub")) write("M=M-D");
         incrementStackPointer();
     }
@@ -218,7 +218,7 @@ public class Translator {
         write("0;JEQ");
 
         emptyLine();
-        write("(" + ti + ")");
+        write("(" + ti + ")", true);
         goToAddressAtStackPointer();
         if (type.equals("lt") || type.equals("gt")) write("M=0");
         else write("M=-1");
@@ -227,14 +227,14 @@ public class Translator {
         // Is it equal, 0 if equal
         if (type.equals("lt") || type.equals("gt")) {
             emptyLine();
-            write("(JEQ" + continueIndex + ")");
+            write("(JEQ" + continueIndex + ")", true);
             goToAddressAtStackPointer();
             write("M=0");
             currentContinue();
         }
 
         emptyLine();
-        write("(N" + ti + ")");
+        write("(N" + ti + ")", true);
         goToAddressAtStackPointer();
         if (type.equals("lt") || type.equals("gt")) write("M=-1");
         else write("M=0");
@@ -277,6 +277,11 @@ public class Translator {
      * @param line the String to write onto asm file
      */
     private void write(String line) {
+        translatedLines.add("   " + line);
+        ++currentLine;
+    }
+
+    private void write(String line, boolean symbol) {
         translatedLines.add(line);
         ++currentLine;
     }
@@ -293,7 +298,7 @@ public class Translator {
      * Add continue block line depending on which block of code we're working on
      */
     private void addContinue() {
-        write("(CONTINUE" + continueIndex + ")");
+        write("(CONTINUE" + continueIndex + ")", true);
         ++continueIndex;
     }
 

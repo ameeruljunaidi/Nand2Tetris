@@ -1,0 +1,19 @@
+Stack
+
+
+sqrt(x - 17 + x * 5)
+
+
+push x
+push 17
+sub
+push x
+push 5
+call Math.multiply
+add
+call Math.sqrt
+
+
+
+
+sqrt((x - 17) + (x * 5))

@@ -1,15 +1,15 @@
 <component name="libraryTable">
   <library name="Apache">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../Apache" />
+      <root url="file://$USER_HOME$/IdeaProjects/Library/Apache" />
     </CLASSES>
     <JAVADOC>
-      <root url="file://$PROJECT_DIR$/../Apache/docs" />
+      <root url="file://$USER_HOME$/IdeaProjects/Library/Apache/docs" />
     </JAVADOC>
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/../Apache" />
+      <root url="file://$USER_HOME$/IdeaProjects/Library/Apache" />
     </SOURCES>
-    <jarDirectory url="file://$PROJECT_DIR$/../Apache" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/../Apache" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$USER_HOME$/IdeaProjects/Library/Apache" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/IdeaProjects/Library/Apache" recursive="false" type="SOURCES" />
   </library>
 </component>
