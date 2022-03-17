@@ -7,12 +7,16 @@ public class Translator {
     private final List<String> translatedLines;
     private int currentLine;
     private int continueIndex;
+    private String calleeName;
+    private String callerName;
 
     public Translator(String filename) {
         parser = new Parser(filename);
         translatedLines = new ArrayList<>();
         continueIndex = 0;
         currentLine = 0;
+        calleeName = "Main";
+        writeInit();
         translate();
     }
 
@@ -21,6 +25,8 @@ public class Translator {
         translatedLines = new ArrayList<>();
         currentLine = 0;
         continueIndex = 0;
+        calleeName = "Main";
+        writeInit();
         translate();
     }
 
@@ -30,13 +36,27 @@ public class Translator {
      */
     private void translate() {
         while (parser.hasMoreCommands()) {
-            if (parser.commandType().equals("C_ARITHMETIC")) writeArithmetic(parser.arg1());
-            else if (parser.commandType().equals("C_PUSH")) writePushPop("C_PUSH", parser.arg1(), parser.arg2());
-            else if (parser.commandType().equals("C_POP")) writePushPop("C_POP", parser.arg1(), parser.arg2());
-            else System.exit(69);
+            switch (parser.commandType()) {
+                case "C_ARITHMETIC" -> writeArithmetic(parser.arg1());
+                case "C_PUSH" -> writePushPop("C_PUSH", parser.arg1(), parser.arg2());
+                case "C_POP" -> writePushPop("C_POP", parser.arg1(), parser.arg2());
+                case "C_LABEL" -> writeLabel(parser.arg1());
+                case "C_GOTO" -> writeGoto(parser.arg1());
+                case "C_IF" -> writeIfGoto(parser.arg1());
+                case "C_FUNCTION" -> writeFunction(parser.arg1(), parser.arg2());
+                case "C_CALL" -> writeCall(parser.arg1(), parser.arg2());
+                case "C_RETURN" -> writeReturn();
+                default -> System.exit(2);
+            }
             parser.advance();
         }
         parser.resetCurrentCommand();
+    }
+
+    private void writeInit() {
+        write("// initializing pointers", true);
+        // TODO
+        emptyLine();
     }
 
     /**
@@ -110,9 +130,7 @@ public class Translator {
 
     private void popToSegmentOf(String segment, int index) {
         storeSegmentAddressIndexedAt("R13", segment, index);
-        decrementStackPointer();
-        goToAddressAtStackPointer();
-        getValueAtAddress();
+        getTopValue();
         storeValueToAddressPointedAt("R13");
     }
 
@@ -128,9 +146,7 @@ public class Translator {
     }
 
     private void popToStatic(int index) {
-        decrementStackPointer();
-        goToAddressAtStackPointer();
-        getValueAtAddress();
+        getTopValue();
         storeValueToAddress(getStaticVariable(index));
     }
 
@@ -143,9 +159,7 @@ public class Translator {
     }
 
     private void popPointer(int index) {
-        decrementStackPointer();
-        goToAddressAtStackPointer();
-        getValueAtAddress();
+        getTopValue();
         if (index == 0) storeValueToAddress("3");
         else storeValueToAddress("4");
     }
@@ -187,7 +201,7 @@ public class Translator {
     }
 
     private void writeAddSub(String type) {
-        getTopValueAndGoToNextTop();
+        getTopValueAndGoToNextTopAddress();
         if (type.equals("add")) write("M=D+M");
         else if (type.equals("sub")) write("M=M-D");
         incrementStackPointer();
@@ -199,7 +213,7 @@ public class Translator {
         String t = type.toUpperCase();
         String ti = t + continueIndex;
 
-        getTopValueAndGoToNextTop();
+        getTopValueAndGoToNextTopAddress();
         write("D=D-M");
 
         emptyLine();
@@ -245,16 +259,132 @@ public class Translator {
         incrementStackPointer();
     }
 
+    private void writeReturn() {
+        includeComment();
+
+        // endFrame (R13) = LCL
+        write("@R1");
+        write("D=M");
+        write("@R13");
+        write("M=D");
+
+        // retAddr (R14) = *(endFrame - 5)
+        write("@5");
+        write("D=A");
+        write("@R13");
+        write("D=M-D");
+        write("@R14");
+        write("M=D");
+
+        // ARG = pop
+        write("@SP");
+        write("M=M-1");
+        write("A=M");
+        write("D=M");
+        write("@R2");
+        write("A=M");
+        write("M=D");
+        write("@R2");
+        write("D=M");
+        write("@SP");
+        write("M=D+1");
+
+        // restore THAT
+        write("@R1");
+        write("D=A");
+        write("@R13");
+        write("D=M-D");
+        write("A=D");
+        write("D=M");
+        write("@R4");
+        write("M=D");
+
+        // restore THIS
+        write("@R2");
+        write("D=A");
+        write("@R13");
+        write("D=M-D");
+        write("A=D");
+        write("D=M");
+        write("@R3");
+        write("M=D");
+
+        // restore ARG
+        write("@R3");
+        write("D=A");
+        write("@R13");
+        write("D=M-D");
+        write("A=D");
+        write("D=M");
+        write("@R2");
+        write("M=D");
+
+        // restore LCL
+        write("@R4");
+        write("D=A");
+        write("@R13");
+        write("D=M-D");
+        write("A=D");
+        write("D=M");
+        write("@R1");
+        write("M=D");
+
+        // TODO: goto retAddr
+
+        emptyLine();
+    }
+
+    private void writeCall(String arg1, int arg2) {
+        includeComment();
+        // TODO
+        emptyLine();
+    }
+
+    private void writeFunction(String functionName, int nArgs) {
+        this.callerName = calleeName;
+        this.calleeName = functionName;
+        includeComment();
+        write("(" + calleeName + ")", true);
+        for (int i = 0; i < nArgs; ++i) pushConstant(0);
+        emptyLine();
+    }
+
+    private void writeIfGoto(String label) {
+        includeComment();
+        getTopValue();
+        goToLabel(label);
+        write("D;JGT");
+        write("D;JLT");
+        emptyLine();
+    }
+
+    private void writeGoto(String label) {
+        includeComment();
+        goToLabel(label);
+        write("0;JEQ");
+        emptyLine();
+    }
+
+    private void writeLabel(String label) {
+        includeComment();
+        write("(" + label + ")", true);
+        emptyLine();
+    }
+
     /**
      * Useful when comparing two topmost on the stack
      * Will have address of second most top pointer on stack
      */
-    private void getTopValueAndGoToNextTop() {
+    private void getTopValueAndGoToNextTopAddress() {
+        getTopValue();
+        decrementStackPointer();
+        goToAddressAtStackPointer();
+    }
+
+    private void getTopValue() {
         decrementStackPointer();
         goToAddressAtStackPointer();
         getValueAtAddress();
-        decrementStackPointer();
-        goToAddressAtStackPointer();
     }
 
     /**
@@ -281,7 +411,7 @@ public class Translator {
         ++currentLine;
     }
 
-    private void write(String line, boolean symbol) {
+    private void write(String line, boolean label) {
         translatedLines.add(line);
         ++currentLine;
     }
@@ -298,8 +428,11 @@ public class Translator {
      * Add continue block line depending on which block of code we're working on
      */
     private void addContinue() {
-        write("(CONTINUE" + continueIndex + ")", true);
-        ++continueIndex;
+        write("(CONTINUE" + getContinueIndex() + ")", true);
+    }
+
+    private int getContinueIndex() {
+        return continueIndex++;
     }
 
     /**
@@ -348,6 +481,10 @@ public class Translator {
         write("A=M");
     }
 
+    private void goToLabel(String label) {
+        write("@" + label);
+    }
+
     /**
      * Go to the address at the pointer
      * Put address at SP to A register
@@ -393,4 +530,5 @@ public class Translator {
         System.out.println(t.currentLine);
         t.generateAssemblyCode();
     }
+
 }

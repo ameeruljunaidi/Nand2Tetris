@@ -35,7 +35,7 @@ public class Parser {
         currentLineNumber = 0;
         parentDirectory = getParentDirectory();
 
-        JFileChooser jfc = new JFileChooser(parentDirectory);
+        JFileChooser jfc = new JFileChooser();
         int returnValue = jfc.showOpenDialog(null);
 
         selectedFile = jfc.getSelectedFile();
@@ -84,6 +84,12 @@ public class Parser {
             case "push" -> "C_PUSH";
             case "pop" -> "C_POP";
             case "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" -> "C_ARITHMETIC";
+            case "label" -> "C_LABEL";
+            case "goto" -> "C_GOTO";
+            case "if-goto" -> "C_IF";
+            case "function" -> "C_FUNCTION";
+            case "call" -> "C_CALL";
+            case "return" -> "C_RETURN";
             default -> "C_TYPE_ERROR";
         };
     }
@@ -96,7 +102,6 @@ public class Parser {
     public String arg1() {
         if (commandType().equals("C_RETURN")) return "ARG1_ERROR";
         if (commandType().equals("C_ARITHMETIC")) return getCurrentCommand().split(" ")[0];
-
         return getCurrentCommand().split(" ")[1];
     }
 
@@ -108,8 +113,7 @@ public class Parser {
     public int arg2() {
         Set<String> accepted = new HashSet<>(Arrays.asList("C_PUSH", "C_POP", "C_FUNCTION", "C_CALL"));
         if (!accepted.contains(commandType())) return 0;
-
-        return Integer.parseInt(getCurrentCommand().split(" ")[2]);
+        return Integer.parseInt(getCurrentCommand().split(" ")[2].trim());
     }
 
 
