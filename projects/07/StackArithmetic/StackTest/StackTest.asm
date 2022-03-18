@@ -1,3 +1,5 @@
+// initializing pointers
+
 // push constant 17
    @17
    D=A

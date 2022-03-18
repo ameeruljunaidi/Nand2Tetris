@@ -1,7 +1,15 @@
 // initializing pointers
    
-// push constant 3030
-   @3030
+// function SimpleFunction.test 2
+(SimpleFunction.test)
+   @0
+   D=A
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   @0
    D=A
    @SP
    A=M
@@ -9,94 +17,31 @@
    @SP
    M=M+1
    
-// pop pointer 0
-   @SP
-   M=M-1
-   @SP
-   A=M
-   D=M
-   @3
-   M=D
-   
-// push constant 3040
-   @3040
+// push local 0
+   @0
    D=A
-   @SP
-   A=M
-   M=D
-   @SP
-   M=M+1
-   
-// pop pointer 1
-   @SP
-   M=M-1
-   @SP
-   A=M
-   D=M
-   @4
-   M=D
-   
-// push constant 32
-   @32
-   D=A
-   @SP
-   A=M
-   M=D
-   @SP
-   M=M+1
-   
-// pop this 2
-   @2
-   D=A
-   @THIS
+   @LCL
    D=D+M
    @R13
    M=D
-   @SP
-   M=M-1
-   @SP
-   A=M
-   D=M
    @R13
    A=M
-   M=D
-   
-// push constant 46
-   @46
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
    
-// pop that 6
-   @6
+// push local 1
+   @1
    D=A
-   @THAT
+   @LCL
    D=D+M
    @R13
    M=D
-   @SP
-   M=M-1
-   @SP
-   A=M
-   D=M
    @R13
    A=M
-   M=D
-   
-// push pointer 0
-   @3
-   D=M
-   @SP
-   A=M
-   M=D
-   @SP
-   M=M+1
-   
-// push pointer 1
-   @4
    D=M
    @SP
    A=M
@@ -118,10 +63,49 @@
    @SP
    M=M+1
    
-// push this 2
-   @2
+// not
+   @SP
+   M=M-1
+   @SP
+   A=M
+   M=!M
+   @SP
+   M=M+1
+   
+// push argument 0
+   @0
    D=A
-   @THIS
+   @ARG
+   D=D+M
+   @R13
+   M=D
+   @R13
+   A=M
+   D=M
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   
+// add
+   @SP
+   M=M-1
+   @SP
+   A=M
+   D=M
+   @SP
+   M=M-1
+   @SP
+   A=M
+   M=D+M
+   @SP
+   M=M+1
+   
+// push argument 1
+   @1
+   D=A
+   @ARG
    D=D+M
    @R13
    M=D
@@ -148,33 +132,58 @@
    @SP
    M=M+1
    
-// push that 6
-   @6
+// return
+   @LCL
+   D=M
+   @R13
+   M=D
+   @5
    D=A
+   @R13
+   D=M-D
+   @R14
+   M=D
+   @SP
+   M=M-1
+   A=M
+   D=M
+   @ARG
+   A=M
+   M=D
+   @ARG
+   D=M
+   @SP
+   M=D+1
+   @1
+   D=A
+   @R13
+   D=M-D
+   A=D
+   D=M
    @THAT
-   D=D+M
-   @R13
    M=D
+   @2
+   D=A
    @R13
-   A=M
+   D=M-D
+   A=D
    D=M
-   @SP
-   A=M
+   @THIS
    M=D
-   @SP
-   M=M+1
-   
-// add
-   @SP
-   M=M-1
-   @SP
-   A=M
+   @3
+   D=A
+   @R13
+   D=M-D
+   A=D
    D=M
-   @SP
-   M=M-1
-   @SP
-   A=M
-   M=D+M
-   @SP
-   M=M+1
+   @ARG
+   M=D
+   @4
+   D=A
+   @R13
+   D=M-D
+   A=D
+   D=M
+   @LCL
+   M=D
    
