@@ -1,5 +1,3 @@
-// initializing pointers
-   
 // function SimpleFunction.test 2
 (SimpleFunction.test)
    @0
@@ -133,16 +131,19 @@
    M=M+1
    
 // return
+   // endFrame (R13) = LCL
    @LCL
    D=M
    @R13
    M=D
+   // retAddr (R14) = *(endFrame - 5)
    @5
    D=A
    @R13
    D=M-D
    @R14
    M=D
+   // ARG = pop
    @SP
    M=M-1
    A=M
@@ -154,6 +155,7 @@
    D=M
    @SP
    M=D+1
+   // restore THAT
    @1
    D=A
    @R13
@@ -162,6 +164,7 @@
    D=M
    @THAT
    M=D
+   // restore THIS
    @2
    D=A
    @R13
@@ -170,6 +173,7 @@
    D=M
    @THIS
    M=D
+   // restore ARG
    @3
    D=A
    @R13
@@ -178,6 +182,7 @@
    D=M
    @ARG
    M=D
+   // restore LCL
    @4
    D=A
    @R13
@@ -186,4 +191,8 @@
    D=M
    @LCL
    M=D
+   // goto retAddr
+   @R14
+   A=M
+   0;JMP
    

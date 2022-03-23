@@ -1,4 +1,70 @@
 // initializing pointers
+   @256
+   D=A
+   @SP
+   M=D
+   
+// function Sys.init 0
+   // push returnAddress
+   @null
+   D=A
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   // push LCL
+   @LCL
+   D=M
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   // push ARG
+   @ARG
+   D=M
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   // push THIS
+   @THIS
+   D=M
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   // push THAT
+   @THAT
+   D=M
+   @SP
+   A=M
+   M=D
+   @SP
+   M=M+1
+   // reposition ARG
+   @SP
+   D=M
+   @5
+   D=D-A
+   @0
+   D=D-A
+   @ARG
+   M=D
+   // reposition LCL
+   @SP
+   D=M
+   @LCL
+   M=D
+   // goto functionName
+   @Sys.init
+   0;JMP
+   // label for return address
+(null)
+   
    
 // function Sys.init 0
 (Sys.init)
@@ -40,6 +106,7 @@
    M=D
    
 // call Sys.main 0
+   // push returnAddress
    @Sys.init$ret.0
    D=A
    @SP
@@ -47,54 +114,62 @@
    M=D
    @SP
    M=M+1
+   // push LCL
    @LCL
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push ARG
    @ARG
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push THIS
    @THIS
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push THAT
    @THAT
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // reposition ARG
    @SP
-   D=A
+   D=M
    @5
    D=D-A
    @0
    D=D-A
    @ARG
    M=D
+   // reposition LCL
    @SP
    D=M
    @LCL
    M=D
-   @Sys.init
+   // goto functionName
+   @Sys.main
    0;JMP
-   (Sys.init$ret.0)
+   // label for return address
+(Sys.init$ret.0)
    
 // pop temp 1
    @1
    D=A
-   @TEMP
+   @5
    D=A+D
    @R13
    M=D
@@ -273,6 +348,7 @@
    M=M+1
    
 // call Sys.add12 1
+   // push returnAddress
    @Sys.main$ret.1
    D=A
    @SP
@@ -280,54 +356,62 @@
    M=D
    @SP
    M=M+1
+   // push LCL
    @LCL
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push ARG
    @ARG
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push THIS
    @THIS
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // push THAT
    @THAT
-   D=A
+   D=M
    @SP
    A=M
    M=D
    @SP
    M=M+1
+   // reposition ARG
    @SP
-   D=A
+   D=M
    @5
    D=D-A
    @1
    D=D-A
    @ARG
    M=D
+   // reposition LCL
    @SP
    D=M
    @LCL
    M=D
-   @Sys.main
+   // goto functionName
+   @Sys.add12
    0;JMP
-   (Sys.main$ret.1)
+   // label for return address
+(Sys.main$ret.1)
    
 // pop temp 0
    @0
    D=A
-   @TEMP
+   @5
    D=A+D
    @R13
    M=D
@@ -477,16 +561,19 @@
    M=M+1
    
 // return
+   // endFrame (R13) = LCL
    @LCL
    D=M
    @R13
    M=D
+   // retAddr (R14) = *(endFrame - 5)
    @5
    D=A
    @R13
    D=M-D
    @R14
    M=D
+   // ARG = pop
    @SP
    M=M-1
    A=M
@@ -498,6 +585,7 @@
    D=M
    @SP
    M=D+1
+   // restore THAT
    @1
    D=A
    @R13
@@ -506,6 +594,7 @@
    D=M
    @THAT
    M=D
+   // restore THIS
    @2
    D=A
    @R13
@@ -514,6 +603,7 @@
    D=M
    @THIS
    M=D
+   // restore ARG
    @3
    D=A
    @R13
@@ -522,6 +612,7 @@
    D=M
    @ARG
    M=D
+   // restore LCL
    @4
    D=A
    @R13
@@ -530,6 +621,10 @@
    D=M
    @LCL
    M=D
+   // goto retAddr
+   @R14
+   A=M
+   0;JMP
    
 // function Sys.add12 0
 (Sys.add12)
@@ -610,16 +705,19 @@
    M=M+1
    
 // return
+   // endFrame (R13) = LCL
    @LCL
    D=M
    @R13
    M=D
+   // retAddr (R14) = *(endFrame - 5)
    @5
    D=A
    @R13
    D=M-D
    @R14
    M=D
+   // ARG = pop
    @SP
    M=M-1
    A=M
@@ -631,6 +729,7 @@
    D=M
    @SP
    M=D+1
+   // restore THAT
    @1
    D=A
    @R13
@@ -639,6 +738,7 @@
    D=M
    @THAT
    M=D
+   // restore THIS
    @2
    D=A
    @R13
@@ -647,6 +747,7 @@
    D=M
    @THIS
    M=D
+   // restore ARG
    @3
    D=A
    @R13
@@ -655,6 +756,7 @@
    D=M
    @ARG
    M=D
+   // restore LCL
    @4
    D=A
    @R13
@@ -663,4 +765,8 @@
    D=M
    @LCL
    M=D
+   // goto retAddr
+   @R14
+   A=M
+   0;JMP
    

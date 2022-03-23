@@ -1,21 +1,25 @@
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Stack;
 
 public class Translator {
     private final Parser parser;
     private final List<String> translatedLines;
     private int currentLine;
     private int continueIndex;
-    private String calleeName;
-    private String callerName;
+    private String currentFunctionName;
+    private String previousFunctionName;
+    private String currentReturnString;
+    private Stack<String> functionCalls;
 
     public Translator(String filename) {
         parser = new Parser(filename);
         translatedLines = new ArrayList<>();
+        functionCalls = new Stack<>();
         continueIndex = 0;
         currentLine = 0;
-        calleeName = "Main";
         writeInit();
         translate();
     }
@@ -23,9 +27,9 @@ public class Translator {
     public Translator() {
         parser = new Parser();
         translatedLines = new ArrayList<>();
+        functionCalls = new Stack<>();
         currentLine = 0;
         continueIndex = 0;
-        calleeName = "Main";
         writeInit();
         translate();
     }
@@ -54,8 +58,15 @@ public class Translator {
     }
 
     private void writeInit() {
+        if (parser.getFileName().equals("SimpleFunction")) return;
         write("// initializing pointers", true);
         // TODO: Write init
+        write("@256");
+        write("D=A");
+        write("@SP");
+        write("M=D");
+        write("");
+        writeCall("Sys.init", 0);
         write("");
     }
 
@@ -150,7 +161,7 @@ public class Translator {
         write("@" + index);
         write("D=A");
         if (segment.equals("TEMP")) {
-            write("@TEMP");
+            write("@5");
             write("D=A+D");
         } else {
             write("@" + segment);
@@ -264,12 +275,12 @@ public class Translator {
 
         write("@SP");
         write("M=M-1");
-        write("@" + "SP");
+        write("@SP");
         write("A=M");
         write("D=M");
         write("@SP");
         write("M=M-1");
-        write("@" + "SP");
+        write("@SP");
         write("A=M");
         write("D=D-M");
 
@@ -324,15 +335,16 @@ public class Translator {
     }
 
     private void writeReturn() {
+        System.out.println(currentLine + " Before " + functionCalls.peek() + " return");
         writeComment();
 
-        // endFrame (R13) = LCL
+        write("// endFrame (R13) = LCL");
         write("@LCL");
         write("D=M");
         write("@R13");
         write("M=D");
 
-        // retAddr (R14) = *(endFrame - 5)
+        write("// retAddr (R14) = *(endFrame - 5)");
         write("@5");
         write("D=A");
         write("@R13");
@@ -340,7 +352,7 @@ public class Translator {
         write("@R14");
         write("M=D");
 
-        // ARG = pop
+        write("// ARG = pop");
         write("@SP");
         write("M=M-1");
         write("A=M");
@@ -353,7 +365,7 @@ public class Translator {
         write("@SP");
         write("M=D+1");
 
-        // restore THAT
+        write("// restore THAT");
         write("@1");
         write("D=A");
         write("@R13");
@@ -363,7 +375,7 @@ public class Translator {
         write("@THAT");
         write("M=D");
 
-        // restore THIS
+        write("// restore THIS");
         write("@2");
         write("D=A");
         write("@R13");
@@ -373,7 +385,7 @@ public class Translator {
         write("@THIS");
         write("M=D");
 
-        // restore ARG
+        write("// restore ARG");
         write("@3");
         write("D=A");
         write("@R13");
@@ -383,7 +395,7 @@ public class Translator {
         write("@ARG");
         write("M=D");
 
-        // restore LCL
+        write("// restore LCL");
         write("@4");
         write("D=A");
         write("@R13");
@@ -393,19 +405,24 @@ public class Translator {
         write("@LCL");
         write("M=D");
 
-        // TODO: goto retAddr
+        write("// goto retAddr");
+        write("@R14");
+        write("A=M");
+        write("0;JMP");
 
         write("");
+
+        System.out.println(currentLine + " After " + functionCalls.pop() + " returns");
     }
 
-    private void writeCall(String arg1, int arg2) {
-        int currentContinueIndex = getContinueIndex();
-        String returnString = calleeName + "$ret." + currentContinueIndex;
-
+    private void writeCall(String functionToCall, int nArg) {
+        // TODO: Fix writeCall
         writeComment();
 
-        // push returnAddress
-        write("@" + returnString);
+        functionCalls.add(functionToCall);
+
+        write("// push returnAddress");
+        write("@" + getCurrentReturnString());
         write("D=A");
         write("@SP");
         write("A=M");
@@ -413,72 +430,77 @@ public class Translator {
         write("@SP");
         write("M=M+1");
 
-        // push LCL
+        write("// push LCL");
         write("@LCL");
-        write("D=A");
+        write("D=M");
         write("@SP");
         write("A=M");
         write("M=D");
         write("@SP");
         write("M=M+1");
 
-        // push ARG
+        write("// push ARG");
         write("@ARG");
-        write("D=A");
+        write("D=M");
         write("@SP");
         write("A=M");
         write("M=D");
         write("@SP");
         write("M=M+1");
 
-        // push THIS
+        write("// push THIS");
         write("@THIS");
-        write("D=A");
+        write("D=M");
         write("@SP");
         write("A=M");
         write("M=D");
         write("@SP");
         write("M=M+1");
 
-        // push THAT
+        write("// push THAT");
         write("@THAT");
-        write("D=A");
+        write("D=M");
         write("@SP");
         write("A=M");
         write("M=D");
         write("@SP");
         write("M=M+1");
 
-        // reposition ARG
+        write("// reposition ARG");
         write("@SP");
-        write("D=A");
+        write("D=M");
         write("@5");
         write("D=D-A");
-        write("@" + arg2);
+        write("@" + nArg);
         write("D=D-A");
         write("@ARG");
         write("M=D");
 
-        // reposition LCL
+        write("// reposition LCL");
         write("@SP");
         write("D=M");
         write("@LCL");
         write("M=D");
 
-        // goto functionName
-        write("@" + calleeName);
+        write("// goto functionName");
+        write("@" + functionToCall);
+        System.out.println(currentLine + " Entry to " + functionToCall);
         write("0;JMP");
 
-        // label for return address
-        write("(" + returnString + ")");
+        write("// label for return address");
+        write("(" + getCurrentReturnString() + ")", true);
 
         write("");
     }
 
     private void writeFunction(String functionName, int nArgs) {
         writeComment();
-        write("(" + calleeName + ")", true);
+
+        currentFunctionName = functionName;
+
+        write("(" + currentFunctionName + ")", true);
         for (int i = 0; i < nArgs; ++i) pushConstant(0);
+
         write("");
     }
 
@@ -514,12 +536,17 @@ public class Translator {
 
     private void write(String line) {
         translatedLines.add("   " + line);
+        if (line.equals("") || line.contains("//")) return;
+        // System.out.println(currentLine + " " + line);
         ++currentLine;
     }
 
     private void write(String line, boolean label) {
         translatedLines.add(line);
-        ++currentLine;
+    }
+
+    private String getCurrentReturnString() {
+        return currentReturnString;
     }
 
     private int getContinueIndex() {
