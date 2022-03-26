@@ -1,3 +1,10 @@
+// initializing pointers
+   @256
+   D=A
+   @SP
+   M=D
+   
+   
 // push argument 1
    @1
    D=A
@@ -159,7 +166,7 @@
    
 // goto END_PROGRAM        
    @END_PROGRAM
-   0;JEQ
+   0;JMP
    
 // label COMPUTE_ELEMENT
 (COMPUTE_ELEMENT)
@@ -324,7 +331,7 @@
    
 // goto MAIN_LOOP_START
    @MAIN_LOOP_START
-   0;JEQ
+   0;JMP
    
 // label END_PROGRAM
 (END_PROGRAM)

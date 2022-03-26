@@ -1,6 +1,5 @@
 import java.io.FileWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -9,10 +8,9 @@ public class Translator {
     private final List<String> translatedLines;
     private int currentLine;
     private int continueIndex;
-    private String currentFunctionName;
-    private String previousFunctionName;
     private String currentReturnString;
-    private Stack<String> functionCalls;
+    private final Stack<String> functionCalls;
+    private String currentFileName;
 
     public Translator(String filename) {
         parser = new Parser(filename);
@@ -20,7 +18,8 @@ public class Translator {
         functionCalls = new Stack<>();
         continueIndex = 0;
         currentLine = 0;
-        currentReturnString = "GLOBAL";
+        currentReturnString = "null";
+        currentFileName = "";
         writeInit();
         translate();
     }
@@ -30,7 +29,8 @@ public class Translator {
         translatedLines = new ArrayList<>();
         functionCalls = new Stack<>();
         currentLine = 0;
-        currentReturnString = "GLOBAL";
+        currentReturnString = "null";
+        currentFileName = "";
         continueIndex = 0;
         writeInit();
         translate();
@@ -43,24 +43,51 @@ public class Translator {
     private void translate() {
         while (parser.hasMoreCommands()) {
             switch (parser.commandType()) {
-                case "C_ARITHMETIC" -> writeArithmetic(parser.arg1());
-                case "C_PUSH" -> writePushPop("C_PUSH", parser.arg1(), parser.arg2());
-                case "C_POP" -> writePushPop("C_POP", parser.arg1(), parser.arg2());
-                case "C_LABEL" -> writeLabel(parser.arg1());
-                case "C_GOTO" -> writeGoto(parser.arg1());
-                case "C_IF" -> writeIfGoto(parser.arg1());
-                case "C_FUNCTION" -> writeFunction(parser.arg1(), parser.arg2());
-                case "C_CALL" -> writeCall(parser.arg1(), parser.arg2());
-                case "C_RETURN" -> writeReturn();
-                default -> System.exit(2);
+                case "C_ARITHMETIC":
+                    writeArithmetic(parser.arg1());
+                    break;
+                case "C_PUSH":
+                    writePushPop("C_PUSH", parser.arg1(), parser.arg2());
+                    break;
+                case "C_POP":
+                    writePushPop("C_POP", parser.arg1(), parser.arg2());
+                    break;
+                case "C_LABEL":
+                    writeLabel(parser.arg1());
+                    break;
+                case "C_GOTO":
+                    writeGoto(parser.arg1());
+                    break;
+                case "C_IF":
+                    writeIfGoto(parser.arg1());
+                    break;
+                case "C_FUNCTION":
+                    writeFunction(parser.arg1(), parser.arg2());
+                    break;
+                case "C_CALL":
+                    writeCall(parser.arg1(), parser.arg2());
+                    break;
+                case "C_RETURN":
+                    writeReturn();
+                    break;
+                case "CHANGE_FILE":
+                    changeFile(parser.arg1());
+                    break;
+                default:
+                    System.exit(2);
+                    break;
             }
             parser.advance();
         }
         parser.resetCurrentCommand();
     }
 
+    private void changeFile(String filename) {
+        currentFileName = filename;
+    }
+
     private void writeInit() {
-        if (parser.getFileName().equals("SimpleFunction")) return;
+        if (parser.getOutputFileName().equals("SimpleFunction")) return;
         write("// initializing pointers", true);
         // TODO: Write init
         write("@256");
@@ -68,7 +95,7 @@ public class Translator {
         write("@SP");
         write("M=D");
         write("");
-        writeCall("Sys.init", 0);
+        if (parser.hasInit()) writeCall("Sys.init", 0);
         write("");
     }
 
@@ -80,15 +107,33 @@ public class Translator {
     private void writeArithmetic(String command) {
         writeComment();
         switch (command) {
-            case "add" -> writeAddSub("add");
-            case "sub" -> writeAddSub("sub");
-            case "eq" -> writeComparison("eq");
-            case "lt" -> writeComparison("lt");
-            case "gt" -> writeComparison("gt");
-            case "not" -> writeLogic("!");
-            case "neg" -> writeLogic("-");
-            case "and" -> writeLogic("&");
-            case "or" -> writeLogic("|");
+            case "add":
+                writeAddSub("add");
+                break;
+            case "sub":
+                writeAddSub("sub");
+                break;
+            case "eq":
+                writeComparison("eq");
+                break;
+            case "lt":
+                writeComparison("lt");
+                break;
+            case "gt":
+                writeComparison("gt");
+                break;
+            case "not":
+                writeLogic("!");
+                break;
+            case "neg":
+                writeLogic("-");
+                break;
+            case "and":
+                writeLogic("&");
+                break;
+            case "or":
+                writeLogic("|");
+                break;
         }
         write("");
     }
@@ -104,24 +149,54 @@ public class Translator {
         writeComment();
         if (command.equals("C_PUSH")) {
             switch (segment) {
-                case "constant" -> pushConstant(index);
-                case "local" -> pushToSegmentOf("LCL", index);
-                case "argument" -> pushToSegmentOf("ARG", index);
-                case "this" -> pushToSegmentOf("THIS", index);
-                case "that" -> pushToSegmentOf("THAT", index);
-                case "temp" -> pushToSegmentOf("TEMP", index);
-                case "static" -> pushToStatic(index);
-                case "pointer" -> pushPointer(index);
+                case "constant":
+                    pushConstant(index);
+                    break;
+                case "local":
+                    pushToSegmentOf("LCL", index);
+                    break;
+                case "argument":
+                    pushToSegmentOf("ARG", index);
+                    break;
+                case "this":
+                    pushToSegmentOf("THIS", index);
+                    break;
+                case "that":
+                    pushToSegmentOf("THAT", index);
+                    break;
+                case "temp":
+                    pushToSegmentOf("TEMP", index);
+                    break;
+                case "static":
+                    pushToStatic(index);
+                    break;
+                case "pointer":
+                    pushPointer(index);
+                    break;
             }
         } else if (command.equals("C_POP")) {
             switch (segment) {
-                case "local" -> popToSegmentOf("LCL", index);
-                case "argument" -> popToSegmentOf("ARG", index);
-                case "this" -> popToSegmentOf("THIS", index);
-                case "that" -> popToSegmentOf("THAT", index);
-                case "temp" -> popToSegmentOf("TEMP", index);
-                case "static" -> popToStatic(index);
-                case "pointer" -> popPointer(index);
+                case "local":
+                    popToSegmentOf("LCL", index);
+                    break;
+                case "argument":
+                    popToSegmentOf("ARG", index);
+                    break;
+                case "this":
+                    popToSegmentOf("THIS", index);
+                    break;
+                case "that":
+                    popToSegmentOf("THAT", index);
+                    break;
+                case "temp":
+                    popToSegmentOf("TEMP", index);
+                    break;
+                case "static":
+                    popToStatic(index);
+                    break;
+                case "pointer":
+                    popPointer(index);
+                    break;
             }
         }
         write("");
@@ -182,7 +257,7 @@ public class Translator {
     }
 
     private String getStaticVariable(int index) {
-        return parser.getFileName() + "." + index;
+        return currentFileName + "." + index;
     }
 
     private void pushToStatic(int index) {
@@ -338,7 +413,6 @@ public class Translator {
     private void writeReturn() {
         writeComment();
 
-        System.out.println(currentLine + " Before " + functionCalls.peek() + " return");
         write("// endFrame (R13) = LCL");
         write("@LCL");
         write("D=M");
@@ -409,8 +483,6 @@ public class Translator {
         write("0;JMP");
 
         write("");
-
-        System.out.println(currentLine + " After " + functionCalls.pop() + " returns");
     }
 
     private void writeCall(String functionToCall, int nArg) {
@@ -483,7 +555,6 @@ public class Translator {
 
         write("// goto functionName");
         write("@" + functionToCall);
-        System.out.println(currentLine + " Entry to " + functionToCall);
         write("0;JMP");
 
         write("// label for return address");
@@ -496,12 +567,9 @@ public class Translator {
         // This is cheating a bit, but it works
         writeComment();
 
-        currentFunctionName = functionName;
-
-        write("(" + currentFunctionName + ")", true);
+        write("(" + functionName + ")", true);
         for (int i = 0; i < nArgs; ++i) pushConstant(0);
 
-        System.out.println(currentLine + " After " + functionName + " prologue");
         write("");
     }
 
@@ -566,6 +634,6 @@ public class Translator {
     }
 
     public void generateAssemblyCode() {
-        generateAssemblyCode(parser.getFileName());
+        generateAssemblyCode(parser.getOutputFileName());
     }
 }

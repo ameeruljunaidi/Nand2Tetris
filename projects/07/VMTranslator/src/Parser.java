@@ -7,47 +7,90 @@ import java.io.IOException;
 import java.util.*;
 
 public class Parser {
-    private final File selectedFile;
-    private final String parentDirectory;
-    private final String fileExtension;
+    private final File selectedSource;
+    private final List<File> selectedSources;
     private List<String> allLines;
     private int currentLineNumber;
+    private final boolean isDirectory;
+    private final boolean hasInit;
 
-    public Parser(String filename) {
+    public Parser(String source) {
         currentLineNumber = 0;
-        parentDirectory = getParentDirectory();
-        selectedFile = new File(filename);
-        fileExtension = getFileExtension();
-
-        if (!selectedFile.exists() || !selectedFile.exists() || !fileExtension.equals("vm")) {
-            System.out.println("Error: Not a valid vm file or file does not exist.");
-            System.exit(1);
-        }
-
-        try {
-            allLines = removeComments(FileUtils.readLines(selectedFile, "UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        selectedSource = new File(source);
+        selectedSources = new ArrayList<>();
+        isDirectory = selectedSource.isDirectory();
+        if (isDirectory) getFilesInDirectory(selectedSource);
+        else selectedSources.add(selectedSource);
+        allLines = new ArrayList<>();
+        checkFileType();
+        readFiles();
+        hasInit = findInit();
     }
 
     public Parser() {
         currentLineNumber = 0;
-        parentDirectory = getParentDirectory();
-
         JFileChooser jfc = new JFileChooser();
         int returnValue = jfc.showOpenDialog(null);
+        selectedSource = jfc.getSelectedFile();
+        selectedSources = new ArrayList<>();
+        isDirectory = selectedSource.isDirectory();
+        if (isDirectory) getFilesInDirectory(selectedSource);
+        else selectedSources.add(selectedSource);
+        checkFilesChooser(returnValue);
+        readFiles();
+        hasInit = findInit();
+    }
 
-        selectedFile = jfc.getSelectedFile();
-        fileExtension = getFileExtension();
-
-        if (returnValue != JFileChooser.APPROVE_OPTION || !fileExtension.equals("vm")) {
-            System.out.println("Error: Not a valid vm file or file does not exist.");
-            System.exit(1);
+    private boolean findInit() {
+        for (File file : selectedSources) {
+            if (file.getName().equals("Sys.vm")) return true;
         }
+        return false;
+    }
 
+    public boolean hasInit() {
+        return hasInit;
+    }
+
+    private void readFiles() {
+        for (File file : selectedSources) {
+            readFile(file);
+        }
+    }
+
+
+    private void checkFilesChooser(int returnValue) {
+        for (File file : selectedSources) {
+            if (returnValue != JFileChooser.APPROVE_OPTION || !getFileExtension(file).equals("vm")) {
+                System.out.println("Error: Not a valid vm file or file does not exist.");
+                System.exit(1);
+            }
+        }
+    }
+
+    private void checkFileType() {
+        for (File file : selectedSources) {
+            if (!file.exists() || !getFileExtension(file).equals("vm")) {
+                System.out.println("Error: Not a valid vm file or file does not exist.");
+                System.exit(1);
+            }
+        }
+    }
+
+    private void getFilesInDirectory(File source) {
+        File[] files = source.listFiles();
+        if (files == null) return;
+        for (File file : files) {
+            if (file.isFile() && getFileExtension(file).equals("vm")) {
+                selectedSources.add(file);
+            }
+        }
+    }
+
+    private void readFile(File source) {
         try {
-            allLines = removeComments(FileUtils.readLines(selectedFile, "UTF-8"));
+            allLines.add("CHANGE_FILE " + FilenameUtils.removeExtension(source.getName()));
+            allLines.addAll(removeComments(FileUtils.readLines(source, "UTF-8")));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -80,18 +123,38 @@ public class Parser {
     public String commandType() {
         String firstChar = getCurrentCommand().split(" ")[0];
 
-        return switch (firstChar) {
-            case "push" -> "C_PUSH";
-            case "pop" -> "C_POP";
-            case "add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not" -> "C_ARITHMETIC";
-            case "label" -> "C_LABEL";
-            case "goto" -> "C_GOTO";
-            case "if-goto" -> "C_IF";
-            case "function" -> "C_FUNCTION";
-            case "call" -> "C_CALL";
-            case "return" -> "C_RETURN";
-            default -> "C_TYPE_ERROR";
-        };
+        switch (firstChar) {
+            case "push":
+                return "C_PUSH";
+            case "pop":
+                return "C_POP";
+            case "add":
+            case "sub":
+            case "neg":
+            case "eq":
+            case "gt":
+            case "lt":
+            case "and":
+            case "or":
+            case "not":
+                return "C_ARITHMETIC";
+            case "label":
+                return "C_LABEL";
+            case "goto":
+                return "C_GOTO";
+            case "if-goto":
+                return "C_IF";
+            case "function":
+                return "C_FUNCTION";
+            case "call":
+                return "C_CALL";
+            case "return":
+                return "C_RETURN";
+            case "CHANGE_FILE":
+                return "CHANGE_FILE";
+            default:
+                return "C_TYPE_ERROR";
+        }
     }
 
     /**
@@ -157,8 +220,8 @@ public class Parser {
      *
      * @return the current file extension
      */
-    private String getFileExtension() {
-        return FilenameUtils.getExtension(selectedFile.getAbsolutePath());
+    private String getFileExtension(File sourceFile) {
+        return FilenameUtils.getExtension(sourceFile.getAbsolutePath());
     }
 
     /**
@@ -186,7 +249,7 @@ public class Parser {
             }
 
             String currentLine = sb.toString();
-            if (!currentLine.isBlank()) commentsRemoved.add(currentLine);
+            if (!currentLine.isEmpty()) commentsRemoved.add(currentLine);
         }
 
         return commentsRemoved;
@@ -216,7 +279,8 @@ public class Parser {
      * @return the current path without the filename
      */
     public String getCurrentDirectory() {
-        return selectedFile.getParent();
+        if (!isDirectory) return selectedSource.getParent();
+        else return selectedSource.getPath();
     }
 
     /**
@@ -224,8 +288,9 @@ public class Parser {
      *
      * @return the file name
      */
-    public String getFileName() {
-        return FilenameUtils.removeExtension(selectedFile.getName());
+    public String getOutputFileName() {
+        if (!isDirectory) return FilenameUtils.removeExtension(selectedSource.getName());
+        else return selectedSource.getName();
     }
 
     /**
