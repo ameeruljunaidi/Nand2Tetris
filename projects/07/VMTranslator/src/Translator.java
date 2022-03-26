@@ -20,6 +20,7 @@ public class Translator {
         functionCalls = new Stack<>();
         continueIndex = 0;
         currentLine = 0;
+        currentReturnString = "GLOBAL";
         writeInit();
         translate();
     }
@@ -29,6 +30,7 @@ public class Translator {
         translatedLines = new ArrayList<>();
         functionCalls = new Stack<>();
         currentLine = 0;
+        currentReturnString = "GLOBAL";
         continueIndex = 0;
         writeInit();
         translate();
@@ -229,7 +231,6 @@ public class Translator {
         }
     }
 
-
     private void writeLogic(String type) {
         write("@SP");
         write("M=M-1");
@@ -335,9 +336,9 @@ public class Translator {
     }
 
     private void writeReturn() {
-        System.out.println(currentLine + " Before " + functionCalls.peek() + " return");
         writeComment();
 
+        System.out.println(currentLine + " Before " + functionCalls.peek() + " return");
         write("// endFrame (R13) = LCL");
         write("@LCL");
         write("D=M");
@@ -348,7 +349,8 @@ public class Translator {
         write("@5");
         write("D=A");
         write("@R13");
-        write("D=M-D");
+        write("A=M-D");
+        write("D=M");
         write("@R14");
         write("M=D");
 
@@ -361,16 +363,15 @@ public class Translator {
         write("A=M");
         write("M=D");
         write("@ARG");
-        write("D=M");
+        write("D=M+1");
         write("@SP");
-        write("M=D+1");
+        write("M=D");
 
         write("// restore THAT");
         write("@1");
         write("D=A");
         write("@R13");
-        write("D=M-D");
-        write("A=D");
+        write("A=M-D");
         write("D=M");
         write("@THAT");
         write("M=D");
@@ -379,8 +380,7 @@ public class Translator {
         write("@2");
         write("D=A");
         write("@R13");
-        write("D=M-D");
-        write("A=D");
+        write("A=M-D");
         write("D=M");
         write("@THIS");
         write("M=D");
@@ -389,8 +389,7 @@ public class Translator {
         write("@3");
         write("D=A");
         write("@R13");
-        write("D=M-D");
-        write("A=D");
+        write("A=M-D");
         write("D=M");
         write("@ARG");
         write("M=D");
@@ -399,8 +398,7 @@ public class Translator {
         write("@4");
         write("D=A");
         write("@R13");
-        write("D=M-D");
-        write("A=D");
+        write("A=M-D");
         write("D=M");
         write("@LCL");
         write("M=D");
@@ -420,6 +418,7 @@ public class Translator {
         writeComment();
 
         functionCalls.add(functionToCall);
+        currentReturnString = functionCalls.peek() + "$ret." + getContinueIndex();
 
         write("// push returnAddress");
         write("@" + getCurrentReturnString());
@@ -469,9 +468,9 @@ public class Translator {
         write("// reposition ARG");
         write("@SP");
         write("D=M");
-        write("@5");
-        write("D=D-A");
         write("@" + nArg);
+        write("D=D-A");
+        write("@5");
         write("D=D-A");
         write("@ARG");
         write("M=D");
@@ -494,6 +493,7 @@ public class Translator {
     }
 
     private void writeFunction(String functionName, int nArgs) {
+        // This is cheating a bit, but it works
         writeComment();
 
         currentFunctionName = functionName;
@@ -501,6 +501,7 @@ public class Translator {
         write("(" + currentFunctionName + ")", true);
         for (int i = 0; i < nArgs; ++i) pushConstant(0);
 
+        System.out.println(currentLine + " After " + functionName + " prologue");
         write("");
     }
 
@@ -520,7 +521,7 @@ public class Translator {
     private void writeGoto(String label) {
         writeComment();
         write("@" + label);
-        write("0;JEQ");
+        write("0;JMP");
         write("");
     }
 
@@ -558,7 +559,7 @@ public class Translator {
             FileWriter fw = new FileWriter(parser.getCurrentDirectory() + "/" + filename + ".asm");
             for (String str : translatedLines) fw.write(str + System.lineSeparator());
             fw.close();
-            System.out.println("Converted to .asm file: " + filename + ".asm");
+            System.out.println("Converted to .asm file: " + parser.getCurrentDirectory() + "/" + filename + ".asm");
         } catch (Exception e) {
             e.printStackTrace();
         }

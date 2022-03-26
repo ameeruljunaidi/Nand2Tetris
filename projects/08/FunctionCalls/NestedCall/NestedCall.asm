@@ -6,7 +6,7 @@
    
 // function Sys.init 0
    // push returnAddress
-   @null
+   @Sys.init$ret.0
    D=A
    @SP
    A=M
@@ -48,9 +48,9 @@
    // reposition ARG
    @SP
    D=M
-   @5
-   D=D-A
    @0
+   D=D-A
+   @5
    D=D-A
    @ARG
    M=D
@@ -63,7 +63,7 @@
    @Sys.init
    0;JMP
    // label for return address
-(null)
+(Sys.init$ret.0)
    
    
 // function Sys.init 0
@@ -107,7 +107,7 @@
    
 // call Sys.main 0
    // push returnAddress
-   @Sys.init$ret.0
+   @Sys.main$ret.1
    D=A
    @SP
    A=M
@@ -149,9 +149,9 @@
    // reposition ARG
    @SP
    D=M
-   @5
-   D=D-A
    @0
+   D=D-A
+   @5
    D=D-A
    @ARG
    M=D
@@ -164,7 +164,7 @@
    @Sys.main
    0;JMP
    // label for return address
-(Sys.init$ret.0)
+(Sys.main$ret.1)
    
 // pop temp 1
    @1
@@ -187,7 +187,7 @@
    
 // goto LOOP
    @LOOP
-   0;JEQ
+   0;JMP
    
 // function Sys.main 5
 (Sys.main)
@@ -349,7 +349,7 @@
    
 // call Sys.add12 1
    // push returnAddress
-   @Sys.main$ret.1
+   @Sys.add12$ret.2
    D=A
    @SP
    A=M
@@ -391,9 +391,9 @@
    // reposition ARG
    @SP
    D=M
-   @5
-   D=D-A
    @1
+   D=D-A
+   @5
    D=D-A
    @ARG
    M=D
@@ -406,7 +406,7 @@
    @Sys.add12
    0;JMP
    // label for return address
-(Sys.main$ret.1)
+(Sys.add12$ret.2)
    
 // pop temp 0
    @0
@@ -570,7 +570,8 @@
    @5
    D=A
    @R13
-   D=M-D
+   A=M-D
+   D=M
    @R14
    M=D
    // ARG = pop
@@ -582,15 +583,14 @@
    A=M
    M=D
    @ARG
-   D=M
+   D=M+1
    @SP
-   M=D+1
+   M=D
    // restore THAT
    @1
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @THAT
    M=D
@@ -598,8 +598,7 @@
    @2
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @THIS
    M=D
@@ -607,8 +606,7 @@
    @3
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @ARG
    M=D
@@ -616,8 +614,7 @@
    @4
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @LCL
    M=D
@@ -714,7 +711,8 @@
    @5
    D=A
    @R13
-   D=M-D
+   A=M-D
+   D=M
    @R14
    M=D
    // ARG = pop
@@ -726,15 +724,14 @@
    A=M
    M=D
    @ARG
-   D=M
+   D=M+1
    @SP
-   M=D+1
+   M=D
    // restore THAT
    @1
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @THAT
    M=D
@@ -742,8 +739,7 @@
    @2
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @THIS
    M=D
@@ -751,8 +747,7 @@
    @3
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @ARG
    M=D
@@ -760,8 +755,7 @@
    @4
    D=A
    @R13
-   D=M-D
-   A=D
+   A=M-D
    D=M
    @LCL
    M=D
