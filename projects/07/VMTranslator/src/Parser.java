@@ -52,13 +52,6 @@ public class Parser {
         return hasInit;
     }
 
-    private void readFiles() {
-        for (File file : selectedSources) {
-            readFile(file);
-        }
-    }
-
-
     private void checkFilesChooser(int returnValue) {
         for (File file : selectedSources) {
             if (returnValue != JFileChooser.APPROVE_OPTION || !getFileExtension(file).equals("vm")) {
@@ -84,6 +77,12 @@ public class Parser {
             if (file.isFile() && getFileExtension(file).equals("vm")) {
                 selectedSources.add(file);
             }
+        }
+    }
+
+    private void readFiles() {
+        for (File file : selectedSources) {
+            readFile(file);
         }
     }
 
@@ -181,7 +180,7 @@ public class Parser {
 
 
     /**
-     * Set teh current command to a certain line number
+     * Set the current command to a certain line number
      *
      * @param lineNumber assign current line number to value passed
      */

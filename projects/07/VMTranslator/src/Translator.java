@@ -89,7 +89,6 @@ public class Translator {
     private void writeInit() {
         if (parser.getOutputFileName().equals("SimpleFunction")) return;
         write("// initializing pointers", true);
-        // TODO: Write init
         write("@256");
         write("D=A");
         write("@SP");
@@ -298,10 +297,10 @@ public class Translator {
         write("A=M");
         write("D=M");
         if (index == 0) {
-            write("@" + "3");
+            write("@3");
             write("M=D");
         } else {
-            write("@" + "4");
+            write("@4");
             write("M=D");
         }
     }
@@ -359,22 +358,17 @@ public class Translator {
         write("@SP");
         write("A=M");
         write("D=D-M");
-
         write("");
         write("@" + ti);
         write("D;J" + t);
-
-        // Is it equal, 0 if equal
         if (type.equals("lt") || type.equals("gt")) {
             write("");
             write("@JEQ" + continueIndex);
             write("D;JEQ");
         }
-
         write("");
         write("@N" + ti);
         write("0;JEQ");
-
         write("");
         write("(" + ti + ")", true);
         write("@" + "SP");
@@ -383,8 +377,6 @@ public class Translator {
         else write("M=-1");
         write("@CONTINUE" + continueIndex);
         write("0;JEQ");
-
-        // Is it equal, 0 if equal
         if (type.equals("lt") || type.equals("gt")) {
             write("");
             write("(JEQ" + continueIndex + ")", true);
@@ -394,7 +386,6 @@ public class Translator {
             write("@CONTINUE" + continueIndex);
             write("0;JEQ");
         }
-
         write("");
         write("(N" + ti + ")", true);
         write("@" + "SP");
@@ -403,7 +394,6 @@ public class Translator {
         else write("M=0");
         write("@CONTINUE" + continueIndex);
         write("0;JEQ");
-
         write("");
         write("(CONTINUE" + getContinueIndex() + ")", true);
         write("@SP");
@@ -412,13 +402,11 @@ public class Translator {
 
     private void writeReturn() {
         writeComment();
-
         write("// endFrame (R13) = LCL");
         write("@LCL");
         write("D=M");
         write("@R13");
         write("M=D");
-
         write("// retAddr (R14) = *(endFrame - 5)");
         write("@5");
         write("D=A");
@@ -427,7 +415,6 @@ public class Translator {
         write("D=M");
         write("@R14");
         write("M=D");
-
         write("// ARG = pop");
         write("@SP");
         write("M=M-1");
@@ -440,7 +427,6 @@ public class Translator {
         write("D=M+1");
         write("@SP");
         write("M=D");
-
         write("// restore THAT");
         write("@1");
         write("D=A");
@@ -449,7 +435,6 @@ public class Translator {
         write("D=M");
         write("@THAT");
         write("M=D");
-
         write("// restore THIS");
         write("@2");
         write("D=A");
@@ -458,7 +443,6 @@ public class Translator {
         write("D=M");
         write("@THIS");
         write("M=D");
-
         write("// restore ARG");
         write("@3");
         write("D=A");
@@ -467,7 +451,6 @@ public class Translator {
         write("D=M");
         write("@ARG");
         write("M=D");
-
         write("// restore LCL");
         write("@4");
         write("D=A");
@@ -476,22 +459,18 @@ public class Translator {
         write("D=M");
         write("@LCL");
         write("M=D");
-
         write("// goto retAddr");
         write("@R14");
         write("A=M");
         write("0;JMP");
-
         write("");
     }
 
     private void writeCall(String functionToCall, int nArg) {
-        // TODO: Fix writeCall
-        writeComment();
-
         functionCalls.add(functionToCall);
         currentReturnString = functionCalls.peek() + "$ret." + getContinueIndex();
 
+        writeComment();
         write("// push returnAddress");
         write("@" + getCurrentReturnString());
         write("D=A");
@@ -500,7 +479,6 @@ public class Translator {
         write("M=D");
         write("@SP");
         write("M=M+1");
-
         write("// push LCL");
         write("@LCL");
         write("D=M");
@@ -509,7 +487,6 @@ public class Translator {
         write("M=D");
         write("@SP");
         write("M=M+1");
-
         write("// push ARG");
         write("@ARG");
         write("D=M");
@@ -518,7 +495,6 @@ public class Translator {
         write("M=D");
         write("@SP");
         write("M=M+1");
-
         write("// push THIS");
         write("@THIS");
         write("D=M");
@@ -527,7 +503,6 @@ public class Translator {
         write("M=D");
         write("@SP");
         write("M=M+1");
-
         write("// push THAT");
         write("@THAT");
         write("D=M");
@@ -536,7 +511,6 @@ public class Translator {
         write("M=D");
         write("@SP");
         write("M=M+1");
-
         write("// reposition ARG");
         write("@SP");
         write("D=M");
@@ -546,30 +520,24 @@ public class Translator {
         write("D=D-A");
         write("@ARG");
         write("M=D");
-
         write("// reposition LCL");
         write("@SP");
         write("D=M");
         write("@LCL");
         write("M=D");
-
         write("// goto functionName");
         write("@" + functionToCall);
         write("0;JMP");
-
         write("// label for return address");
         write("(" + getCurrentReturnString() + ")", true);
-
         write("");
     }
 
     private void writeFunction(String functionName, int nArgs) {
         // This is cheating a bit, but it works
         writeComment();
-
         write("(" + functionName + ")", true);
         for (int i = 0; i < nArgs; ++i) pushConstant(0);
-
         write("");
     }
 
@@ -606,7 +574,6 @@ public class Translator {
     private void write(String line) {
         translatedLines.add("   " + line);
         if (line.equals("") || line.contains("//")) return;
-        // System.out.println(currentLine + " " + line);
         ++currentLine;
     }
 
