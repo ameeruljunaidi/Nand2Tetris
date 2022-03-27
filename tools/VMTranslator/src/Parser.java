@@ -12,7 +12,6 @@ public class Parser {
     private List<String> allLines;
     private int currentLineNumber;
     private final boolean isDirectory;
-    private final boolean hasInit;
 
     public Parser(String source) {
         currentLineNumber = 0;
@@ -23,8 +22,8 @@ public class Parser {
         else selectedSources.add(selectedSource);
         allLines = new ArrayList<>();
         checkFileType();
+        findInit();
         readFiles();
-        hasInit = findInit();
     }
 
     public Parser() {
@@ -36,20 +35,16 @@ public class Parser {
         isDirectory = selectedSource.isDirectory();
         if (isDirectory) getFilesInDirectory(selectedSource);
         else selectedSources.add(selectedSource);
+        allLines = new ArrayList<>();
         checkFilesChooser(returnValue);
+        findInit();
         readFiles();
-        hasInit = findInit();
     }
 
-    private boolean findInit() {
+    private void findInit() {
         for (File file : selectedSources) {
-            if (file.getName().equals("Sys.vm")) return true;
+            if (file.getName().equals("Sys.vm")) allLines.add("call Sys.init 0");
         }
-        return false;
-    }
-
-    public boolean hasInit() {
-        return hasInit;
     }
 
     private void checkFilesChooser(int returnValue) {

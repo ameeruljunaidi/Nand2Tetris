@@ -17,7 +17,7 @@ public class Parser {
     public Parser(String filename) {
         this.currentLineNumber = 0;
         this.parentDirectory = getParentDirectory();
-        this.selectedFile = new File(this.parentDirectory + "/" + filename);
+        this.selectedFile = new File(filename);
         this.fileExtension = getFileExtension();
 
         if (!this.selectedFile.exists() || !this.selectedFile.exists() || !this.fileExtension.equals("asm")) {

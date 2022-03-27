@@ -106,7 +106,7 @@ public class Assembler {
             FileWriter fw = new FileWriter(parser.getCurrentDirectory() + "/" + filename + ".hack");
             for (String str : translatedLines) fw.write(str + System.lineSeparator());
             fw.close();
-            System.out.println("Converted to .hack file: " + filename + ".hack");
+            System.out.println("Converted to .hack file: " + parser.getCurrentDirectory() + "/" + filename + ".hack");
         } catch (Exception e) {
             e.printStackTrace();
         }

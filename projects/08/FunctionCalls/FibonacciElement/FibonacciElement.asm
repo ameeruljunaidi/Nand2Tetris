@@ -4,7 +4,7 @@
    @SP
    M=D
    
-// CHANGE_FILE Main
+// call Sys.init 0
    // push returnAddress
    @Sys.init$ret.0
    D=A
@@ -64,7 +64,6 @@
    0;JMP
    // label for return address
 (Sys.init$ret.0)
-   
    
 // function Main.fibonacci 0
 (Main.fibonacci)

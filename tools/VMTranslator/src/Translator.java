@@ -94,8 +94,6 @@ public class Translator {
         write("@SP");
         write("M=D");
         write("");
-        if (parser.hasInit()) writeCall("Sys.init", 0);
-        write("");
     }
 
     /**
@@ -216,7 +214,7 @@ public class Translator {
         write("D=A");
         if (segment.equals("TEMP")) {
             write("@5");
-            write("D=A+D");
+            write("D=D+A");
         } else {
             write("@" + segment);
             write("D=D+M");
@@ -238,7 +236,7 @@ public class Translator {
         write("D=A");
         if (segment.equals("TEMP")) {
             write("@5");
-            write("D=A+D");
+            write("D=D+A");
         } else {
             write("@" + segment);
             write("D=D+M");

@@ -4,7 +4,7 @@
    @SP
    M=D
    
-// CHANGE_FILE Class1
+// call Sys.init 0
    // push returnAddress
    @Sys.init$ret.0
    D=A
@@ -64,7 +64,6 @@
    0;JMP
    // label for return address
 (Sys.init$ret.0)
-   
    
 // function Class1.set 0
 (Class1.set)
@@ -375,7 +374,7 @@
    @0
    D=A
    @5
-   D=A+D
+   D=D+A
    @R13
    M=D
    @SP
@@ -470,7 +469,7 @@
    @0
    D=A
    @5
-   D=A+D
+   D=D+A
    @R13
    M=D
    @SP
